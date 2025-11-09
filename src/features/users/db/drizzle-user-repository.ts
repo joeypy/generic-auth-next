@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { user } from "./schema";
 import { BaseRepository } from "@/shared/database/base-repository";
 import { User, CreateUserData, UpdateUserData } from "../types/user";
+import { generateId } from "@/shared/utils/id-generator";
 
 // User repository implementation
 export class DrizzleUserRepository extends BaseRepository<User> {
@@ -9,8 +10,9 @@ export class DrizzleUserRepository extends BaseRepository<User> {
     const [newUser] = await this.db
       .insert(user)
       .values({
+        id: generateId(),
         ...data,
-        emailVerified: false,
+        emailVerified: true,
         twoFactorEnabled: false,
         banned: false,
       })
@@ -53,7 +55,7 @@ export class DrizzleUserRepository extends BaseRepository<User> {
   async delete(id: string): Promise<boolean> {
     const result = await this.db.delete(user).where(eq(user.id, id));
 
-    return result.rowCount > 0;
+    return result.length > 0;
   }
 
   async findByStripeCustomerId(stripeCustomerId: string): Promise<User | null> {

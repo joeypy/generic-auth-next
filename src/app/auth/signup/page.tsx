@@ -1,15 +1,9 @@
-import { RegisterForm, AuthLayout } from "@/features/auth";
+import { SignUpForm } from "@/features/auth/components/signup-form";
 
 export default function RegisterPage() {
   return (
-    <AuthLayout
-      title="Create your account"
-      subtitle="Or"
-      linkText="sign in to your existing account"
-      linkHref="/auth/signin"
-      linkDescription=""
-    >
-      <RegisterForm />
-    </AuthLayout>
+    <div className="flex items-center justify-center h-screen">
+      <SignUpForm  />
+    </div>
   );
 }

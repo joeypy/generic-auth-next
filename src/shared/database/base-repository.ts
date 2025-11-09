@@ -1,10 +1,11 @@
 import { DatabaseRepository, BaseEntity } from "@/shared/types/database";
+import { Database } from "./drizzle/drizzle";
 
 // Abstract base repository following SOLID principles
 export abstract class BaseRepository<T extends BaseEntity>
   implements DatabaseRepository<T>
 {
-  constructor(protected db: any) {}
+  constructor(protected db: Database) {}
 
   abstract create(data: Omit<T, "id" | "createdAt" | "updatedAt">): Promise<T>;
   abstract findById(id: string): Promise<T | null>;

@@ -1,15 +1,9 @@
-import { LoginForm, AuthLayout } from "@/features/auth";
+import { SignInForm } from "@/features/auth/components/signin-form";
 
 export default function LoginPage() {
   return (
-    <AuthLayout
-      title="Sign in to your account"
-      subtitle="Or"
-      linkText="create a new account"
-      linkHref="/auth/signup"
-      linkDescription=""
-    >
-      <LoginForm />
-    </AuthLayout>
+    <div className="flex items-center justify-center h-screen">
+      <SignInForm />
+    </div>
   );
 }

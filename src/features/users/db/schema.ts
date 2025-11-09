@@ -23,5 +23,5 @@ export const user = pgTable("user", {
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
   stripeCustomerId: text("stripe_customer_id"),
-  favoriteNumber: integer("favorite_number").notNull(),
+  favoriteNumber: integer("favorite_number"),
 });

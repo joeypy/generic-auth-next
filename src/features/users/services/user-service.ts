@@ -1,9 +1,9 @@
-import { UserRepository } from "./repository";
+import { DrizzleUserRepository } from "../db/drizzle-user-repository";
 import { CreateUserData, UpdateUserData, User } from "../types/user";
 
 // User service implementing business logic (SOLID - Single Responsibility)
 export class UserService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(private userRepository: DrizzleUserRepository) {}
 
   async createUser(data: CreateUserData): Promise<User> {
     // Business logic: validate email format, check if user exists, etc.

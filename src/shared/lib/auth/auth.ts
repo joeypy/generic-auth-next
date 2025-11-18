@@ -2,6 +2,11 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { databaseConnection } from "../../database/drizzle/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import {
+  sendPasswordResetEmail,
+  sendEmailVerificationEmail,
+  sendDeleteAccountVerificationEmail,
+} from "../email/user-case";
 
 export const COOKIE_COMPLETE_NAME = "better_session_token";
 
@@ -9,8 +14,48 @@ export const auth = betterAuth({
   database: drizzleAdapter(databaseConnection.getDb(), {
     provider: "pg",
   }),
+  user: {
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ user, url, newEmail }) => {
+        await sendEmailVerificationEmail({
+          user: { ...user, email: newEmail },
+          url,
+        });
+      },
+    },
+    deleteUser: {
+      enabled: true,
+      sendDeleteAccountVerification: async ({ user, url }) => {
+        await sendDeleteAccountVerificationEmail({ user, url });
+      },
+    },
+    additionalFields: {
+      favoriteNumber: {
+        type: "number",
+        required: true,
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendPasswordResetEmail({
+        user,
+        url,
+      });
+    },
+  },
+  emailVerification: {
+    autoSignInAfterVerification: true,
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendEmailVerificationEmail({
+        user,
+        url,
+      });
+    },
   },
   rateLimit: {
     storage: "database",

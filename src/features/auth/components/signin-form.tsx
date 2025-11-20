@@ -66,16 +66,16 @@ export function SignInForm() {
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">
-          🔐 Welcome back
+          🔐 Bienvenido de nuevo
         </CardTitle>
         <CardDescription className="text-center">
-          Enter your credentials to access your account
+          Ingresa tus credenciales para acceder a tu cuenta
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <Field>
-            <FieldLabel htmlFor="email">Email Address</FieldLabel>
+            <FieldLabel htmlFor="email">Correo electrónico</FieldLabel>
             <FieldControl>
               <Input
                 id="email"
@@ -91,7 +91,7 @@ export function SignInForm() {
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <FieldLabel htmlFor="password">Contraseña</FieldLabel>
             <FieldControl>
               <PasswordInput
                 id="password"
@@ -108,27 +108,27 @@ export function SignInForm() {
           <div className="flex items-center justify-between">
             <div className="text-sm">
               <Link
-                href="/forgot-password"
+                href="/auth/forgot-password"
                 className="font-medium text-primary hover:text-primary/80"
               >
-                Forgot your password?
+                ¿Olvidaste tu contraseña?
               </Link>
             </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Signing in..." : "Sign in"}
+            {isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
           </Button>
 
           <div className="text-center text-sm">
             <span className="text-muted-foreground">
-              Don't have an account?{" "}
+              ¿No tienes una cuenta?{" "}
             </span>
             <Link
               href="/auth/signup"
               className="font-medium text-primary hover:text-primary/80"
             >
-              Sign up
+              Crear cuenta
             </Link>
           </div>
         </form>

@@ -41,10 +41,35 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
-      await sendPasswordResetEmail({
-        user,
-        url,
-      });
+      // Better-auth ya valida que el usuario existe antes de llamar este callback
+      // pero verificamos por si acaso
+      if (!user) {
+        const error = new Error("USER_NOT_FOUND");
+        console.error("Error: Usuario no encontrado en sendResetPassword");
+        throw error;
+      }
+
+      // Verificar que el correo esté verificado si requireEmailVerification está activo
+      if (!user.emailVerified) {
+        const error = new Error("EMAIL_NOT_VERIFIED");
+        console.error("Error: Correo no verificado para usuario:", user.email);
+        throw error;
+      }
+
+      try {
+        await sendPasswordResetEmail({
+          user,
+          url,
+        });
+        console.log(
+          "Correo de restablecimiento enviado exitosamente a:",
+          user.email
+        );
+      } catch (error) {
+        console.error("Error al enviar correo de restablecimiento:", error);
+        // Re-lanzar el error para que better-auth lo maneje
+        throw error;
+      }
     },
   },
   emailVerification: {

@@ -9,6 +9,12 @@ import { organization } from "@/features/organizations/db/schemas/drizzle-organi
 import { member } from "@/features/organizations/db/schemas/drizzle-member-schema";
 import { invitation } from "@/features/organizations/db/schemas/drizzle-invitation-schema";
 import { subscription } from "@/features/subscriptions/db/schemas/drizzle-subscription-schema";
+import { recipes } from "@/features/gastronomy/db/schemas/drizzle-recipe-schema";
+import { units } from "@/features/gastronomy/db/schemas/drizzle-unit-schema";
+import { recipeIngredients } from "@/features/gastronomy/db/schemas/drizzle-recipe-ingredient-schema";
+import { recipeInstructions } from "@/features/gastronomy/db/schemas/drizzle-recipe-instruction-schema";
+import { recipeSubrecipes } from "@/features/gastronomy/db/schemas/drizzle-recipe-subrecipe-schema";
+import { recipeBudgets } from "@/features/gastronomy/db/schemas/drizzle-recipe-budget-schema";
 
 export const schema = {
   user,
@@ -21,4 +27,30 @@ export const schema = {
   member,
   invitation,
   subscription,
+  recipes,
+  units,
+  recipeIngredients,
+  recipeInstructions,
+  recipeSubrecipes,
+  recipeBudgets,
+};
+
+// Export individual schemas for Drizzle
+export {
+  user,
+  session,
+  account,
+  verification,
+  twoFactor,
+  passkey,
+  organization,
+  member,
+  invitation,
+  subscription,
+  recipes,
+  units,
+  recipeIngredients,
+  recipeInstructions,
+  recipeSubrecipes,
+  recipeBudgets,
 };

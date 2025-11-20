@@ -1,13 +1,12 @@
 import { databaseConnection } from "@/shared/database/drizzle/drizzle";
 import { UserRepository } from "@/features/users";
-import { SessionRepository } from "@/features/auth/sessions";
-import { EmailVerificationRepository } from "@/features/auth/email-verification";
+import { SessionRepository, VerificationRepository } from "@/features/auth";
 
 // Repository factory following SOLID principles
 export class RepositoryFactory {
   private static userRepository: UserRepository | null = null;
   private static sessionRepository: SessionRepository | null = null;
-  private static emailVerificationRepository: EmailVerificationRepository | null =
+  private static emailVerificationRepository: VerificationRepository | null =
     null;
 
   static getUserRepository(): UserRepository {
@@ -26,9 +25,9 @@ export class RepositoryFactory {
     return this.sessionRepository;
   }
 
-  static getEmailVerificationRepository(): EmailVerificationRepository {
+  static getEmailVerificationRepository(): VerificationRepository {
     if (!this.emailVerificationRepository) {
-      this.emailVerificationRepository = new EmailVerificationRepository(
+      this.emailVerificationRepository = new VerificationRepository(
         databaseConnection.getDb()
       );
     }

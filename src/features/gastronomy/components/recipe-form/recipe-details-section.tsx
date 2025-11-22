@@ -22,7 +22,7 @@ interface RecipeDetailsSectionProps {
 
 export function RecipeDetailsSection({ form }: RecipeDetailsSectionProps) {
   return (
-    <div className="bg-card rounded-lg border p-6">
+    <div className="bg-card rounded-lg border shadow-md p-6">
       <h2 className="text-xl font-semibold mb-6">Detalles de la Receta</h2>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -91,7 +91,7 @@ export function RecipeDetailsSection({ form }: RecipeDetailsSectionProps) {
               <FormLabel>Dificultad</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Seleccionar" />
                   </SelectTrigger>
                 </FormControl>

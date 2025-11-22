@@ -11,6 +11,7 @@ export const recipeFormSchema = z.object({
   category: z.string().optional(),
   isSubrecipe: z.boolean().default(false),
   tags: z.array(z.string()).default([]),
+  utensils: z.array(z.string()).default([]),
   ingredients: z
     .array(
       z.object({
@@ -30,6 +31,22 @@ export const recipeFormSchema = z.object({
       })
     )
     .min(1, "Debe agregar al menos una instrucción"),
+  tips: z
+    .array(z.string())
+    .default([])
+    .optional(),
+  subrecipes: z
+    .array(
+      z.object({
+        subrecipeId: z.string().min(1, "La sub receta es requerida"),
+        quantity: z.number().min(0, "La cantidad debe ser positiva").optional(),
+        unitId: z.string().optional(),
+        notes: z.string().optional(),
+        sortOrder: z.number().default(0),
+      })
+    )
+    .default([])
+    .optional(),
 });
 
 export type RecipeFormData = z.infer<typeof recipeFormSchema>;

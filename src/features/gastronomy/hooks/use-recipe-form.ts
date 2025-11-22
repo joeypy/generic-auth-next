@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { recipeFormSchema, type RecipeFormData } from "../schemas/recipe-form-schema";
+import {
+  recipeFormSchema,
+  type RecipeFormData,
+} from "../schemas/recipe-form-schema";
 import type { Recipe } from "../types/recipe";
 
 interface UseRecipeFormProps {
@@ -26,6 +29,9 @@ export function useRecipeForm({ recipe, mode, onSubmit }: UseRecipeFormProps) {
         category: "",
         isSubrecipe: false,
         tags: [],
+        utensils: [""],
+        tips: [""],
+        subrecipes: [],
         ingredients: [
           { name: "", quantity: 0, unitId: "", notes: "", sortOrder: 0 },
         ],
@@ -33,7 +39,16 @@ export function useRecipeForm({ recipe, mode, onSubmit }: UseRecipeFormProps) {
       };
     }
 
-    const baseName = mode === "duplicate" ? `${recipe.name} (Copia)` : recipe.name;
+    const baseName =
+      mode === "duplicate" ? `${recipe.name} (Copia)` : recipe.name;
+
+    // Validar difficulty para que sea uno de los valores permitidos
+    const validDifficulty =
+      recipe.difficulty === "easy" ||
+      recipe.difficulty === "medium" ||
+      recipe.difficulty === "hard"
+        ? recipe.difficulty
+        : "easy";
 
     return {
       name: baseName,
@@ -42,10 +57,14 @@ export function useRecipeForm({ recipe, mode, onSubmit }: UseRecipeFormProps) {
       prepTime: recipe.prepTime || 0,
       cookTime: recipe.cookTime || 0,
       servings: recipe.servings || 4,
-      difficulty: recipe.difficulty || "easy",
+      difficulty: validDifficulty,
       category: recipe.category || "",
       isSubrecipe: recipe.isSubrecipe || false,
       tags: recipe.tags || [],
+      // utensils y tips no existen en el schema de la BD, se inicializan vacíos
+      utensils: [""],
+      tips: [""],
+      subrecipes: [],
       ingredients: [
         { name: "", quantity: 0, unitId: "", notes: "", sortOrder: 0 },
       ],
@@ -53,9 +72,9 @@ export function useRecipeForm({ recipe, mode, onSubmit }: UseRecipeFormProps) {
     };
   };
 
-  const form = useForm<RecipeFormData>({
+  const form: UseFormReturn<RecipeFormData> = useForm<RecipeFormData>({
     resolver: zodResolver(recipeFormSchema),
-    defaultValues: getDefaultValues(),
+    defaultValues: getDefaultValues() as RecipeFormData,
   });
 
   const [newTag, setNewTag] = useState("");
@@ -123,9 +142,108 @@ export function useRecipeForm({ recipe, mode, onSubmit }: UseRecipeFormProps) {
     );
   };
 
-  const handleSubmit = form.handleSubmit((data) => {
+  const addSubrecipe = (subrecipeId: string) => {
+    const currentSubrecipes = form.getValues("subrecipes") || [];
+    // Verificar que no esté ya agregada
+    if (currentSubrecipes.some((sr) => sr.subrecipeId === subrecipeId)) {
+      return;
+    }
+    form.setValue("subrecipes", [
+      ...currentSubrecipes,
+      {
+        subrecipeId,
+        quantity: undefined,
+        unitId: undefined,
+        notes: undefined,
+        sortOrder: currentSubrecipes.length,
+      },
+    ]);
+  };
+
+  const removeSubrecipe = (index: number) => {
+    const currentSubrecipes = form.getValues("subrecipes") || [];
+    form.setValue(
+      "subrecipes",
+      currentSubrecipes.filter((_, i) => i !== index)
+    );
+  };
+
+  const handleSubmit = form.handleSubmit((data: RecipeFormData) => {
     onSubmit(data);
   });
+
+  // Helper functions para obtener valores del formulario con defaults
+  const getFormValue = <T extends keyof RecipeFormData>(
+    field: T,
+    defaultValue: RecipeFormData[T]
+  ): RecipeFormData[T] => {
+    const value = form.watch(field);
+    if (Array.isArray(value)) {
+      return (value.length > 0 ? value : defaultValue) as RecipeFormData[T];
+    }
+    return (value ?? defaultValue) as RecipeFormData[T];
+  };
+
+  const formInstructions = () => {
+    return getFormValue("instructions", [
+      { stepNumber: 1, instruction: "" },
+    ]) as Array<{ stepNumber: number; instruction: string }>;
+  };
+
+  const formUtensils = () => {
+    return getFormValue("utensils", [""]) as string[];
+  };
+
+  const formTips = () => {
+    return getFormValue("tips", [""]) as string[];
+  };
+
+  // Funciones genéricas para convertir entre formatos
+  const stringArrayToItems = (arr: string[], prefix: string) => {
+    return arr.map((item, index) => ({
+      id: `${prefix}-${index}`,
+      text: item,
+    }));
+  };
+
+  const itemsToStringArray = (items: Array<{ id: string; text: string }>) => {
+    const result = items.map((item) => item.text);
+    return result.length === 0 ? [""] : result;
+  };
+
+  const instructionsToItems = (
+    instructions: Array<{ stepNumber: number; instruction: string }>
+  ) => {
+    return instructions.map((inst, index) => ({
+      id: `instruction-${index}`,
+      text: inst.instruction,
+    }));
+  };
+
+  const itemsToInstructions = (items: Array<{ id: string; text: string }>) => {
+    const instructions = items.map((item, index) => ({
+      stepNumber: index + 1,
+      instruction: item.text,
+    }));
+    return instructions.length === 0
+      ? [{ stepNumber: 1, instruction: "" }]
+      : instructions;
+  };
+
+  // Handlers para onChange de cada sección
+  const handleInstructionsChange = (
+    items: Array<{ id: string; text: string }>
+  ) => {
+    form.setValue("instructions", itemsToInstructions(items));
+  };
+
+  const handleUtensilsChange = (items: Array<{ id: string; text: string }>) => {
+    form.setValue("utensils", itemsToStringArray(items));
+  };
+
+  const handleTipsChange = (items: Array<{ id: string; text: string }>) => {
+    form.setValue("tips", itemsToStringArray(items));
+  };
 
   return {
     form,
@@ -133,10 +251,22 @@ export function useRecipeForm({ recipe, mode, onSubmit }: UseRecipeFormProps) {
     setNewTag,
     addIngredient,
     removeIngredient,
-    addInstruction,
-    removeInstruction,
+    addSubrecipe,
+    removeSubrecipe,
     addTag,
     removeTag,
     handleSubmit,
+    // Valores del formulario
+    formInstructions,
+    formUtensils,
+    formTips,
+    // Conversiones
+    instructionsToItems,
+    utensilsToItems: () => stringArrayToItems(formUtensils(), "utensil"),
+    tipsToItems: () => stringArrayToItems(formTips(), "tip"),
+    // Handlers
+    handleInstructionsChange,
+    handleUtensilsChange,
+    handleTipsChange,
   };
 }

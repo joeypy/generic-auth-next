@@ -8,6 +8,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
 } from "@/shared/components/ui/select";
 import {
   FormControl,
@@ -52,7 +54,7 @@ export function IngredientsSection({
   const ingredients = form.watch("ingredients") || [];
 
   return (
-    <div className="bg-card rounded-lg border p-6">
+    <div className="bg-card rounded-lg border shadow-md p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold">Ingredientes</h2>
         <Button type="button" onClick={onAddIngredient} size="sm">
@@ -123,13 +125,14 @@ export function IngredientsSection({
                       <SelectContent>
                         {Object.entries(UNIT_CATEGORIES).map(
                           ([category, units]) => (
-                            <optgroup key={category} label={category}>
+                            <SelectGroup key={category}>
+                              <SelectLabel>{category}</SelectLabel>
                               {units.map((unit) => (
                                 <SelectItem key={unit.id} value={unit.id}>
                                   {unit.name} ({unit.abbr})
                                 </SelectItem>
                               ))}
-                            </optgroup>
+                            </SelectGroup>
                           )
                         )}
                       </SelectContent>

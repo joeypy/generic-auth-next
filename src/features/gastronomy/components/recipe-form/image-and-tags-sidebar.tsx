@@ -1,5 +1,6 @@
 import { UseFormReturn } from "react-hook-form";
 import { X } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Input } from "@/shared/components/ui/input";
 import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
@@ -10,6 +11,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
+import { ImageUploader, type ImageFile } from "@/shared/components/image-uploader";
 import type { RecipeFormData } from "../../schemas/recipe-form-schema";
 
 interface ImageAndTagsSidebarProps {
@@ -27,69 +29,51 @@ export function ImageAndTagsSidebar({
   onAddTag,
   onRemoveTag,
 }: ImageAndTagsSidebarProps) {
-  const imageUrl = form.watch("imageUrl");
   const tags = form.watch("tags") || [];
+  const imageUrl = form.watch("imageUrl") || "";
+  
+  // Initialize images state only on client to avoid hydration errors
+  const [images, setImages] = useState<ImageFile[]>([]);
+
+  // Update images when imageUrl changes (only on client)
+  useEffect(() => {
+    if (imageUrl) {
+      setImages([{ id: "1", url: imageUrl, file: undefined }]);
+    } else {
+      setImages([]);
+    }
+  }, [imageUrl]);
+
+  const handleImagesChange = (newImages: ImageFile[]) => {
+    setImages(newImages);
+    // Update form with first image URL
+    form.setValue("imageUrl", newImages.length > 0 ? newImages[0].url : "");
+  };
 
   return (
     <div className="space-y-6">
       {/* Image Section */}
-      <div className="bg-card rounded-lg border p-6">
+      <div className="bg-card rounded-lg border shadow-md p-6">
         <h3 className="text-lg font-semibold mb-4">Imagen del Plato</h3>
 
-        <div className="space-y-4">
-          {imageUrl && (
-            <div className="relative">
-              <img
-                src={imageUrl}
-                alt="Preview"
-                className="w-full h-48 object-cover rounded-lg"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                className="absolute top-2 right-2 h-8 w-8"
-                onClick={() => form.setValue("imageUrl", "")}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
+        <ImageUploader
+          images={images}
+          onChange={handleImagesChange}
+          maxImages={5}
+        />
 
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>URL de la imagen</FormLabel>
-                <FormControl>
-                  <Input
-                    type="url"
-                    placeholder="https://ejemplo.com/imagen.jpg"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="text-sm text-muted-foreground">
-            <p>💡 Puedes usar imágenes de:</p>
-            <ul className="list-disc list-inside mt-1 space-y-1">
-              <li>Pexels.com</li>
-              <li>Unsplash.com</li>
-              <li>Tu propia URL</li>
-            </ul>
-          </div>
+        <div className="text-sm text-gray-500 mt-4">
+          <p>💡 Puedes usar imágenes de:</p>
+          <ul className="list-disc list-inside mt-1 space-y-1">
+            <li>Pexels.com</li>
+            <li>Unsplash.com</li>
+            <li>Tu propia URL</li>
+          </ul>
         </div>
       </div>
 
       {/* Tags Section */}
-      <div className="bg-card rounded-lg border p-6">
+      <div className="bg-card rounded-lg border shadow-md p-6">
         <h3 className="text-lg font-semibold mb-4">Etiquetas</h3>
 
         <div className="space-y-4">

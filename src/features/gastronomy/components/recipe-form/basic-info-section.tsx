@@ -8,7 +8,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/components/ui/form";
-import type { RecipeFormData } from "../schemas/recipe-form-schema";
+import { RecipeFormData } from "../../schemas/recipe-form-schema";
 
 interface BasicInfoSectionProps {
   form: UseFormReturn<RecipeFormData>;
@@ -16,7 +16,7 @@ interface BasicInfoSectionProps {
 
 export function BasicInfoSection({ form }: BasicInfoSectionProps) {
   return (
-    <div className="bg-card rounded-lg border p-6 space-y-6">
+    <div className="bg-card rounded-lg border shadow-md p-6 space-y-6">
       <h2 className="text-xl font-semibold">Información Básica</h2>
 
       <FormField
